@@ -174,8 +174,8 @@ esp_err_t esp_mesh_comm_p2p_start(void)
     static bool is_comm_p2p_started = false;
     if (!is_comm_p2p_started) {
         is_comm_p2p_started = true;
-        xTaskCreate(send_mesh_p2p_task, "mesh_p2p_tx_task", 10240, NULL, 5, NULL);
-        xTaskCreate(rcv_mesh_p2p_task, "mesh_p2p_rx_task", 10240, NULL, 5, NULL);
+        xTaskCreatePinnedToCore(send_mesh_p2p_task, "mesh_p2p_tx_task", 10240, NULL, 5, NULL, 0);
+        xTaskCreatePinnedToCore(rcv_mesh_p2p_task, "mesh_p2p_tx_task", 10240, NULL, 5, NULL, 0);
     }
     return ESP_OK;
 }

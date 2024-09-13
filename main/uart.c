@@ -324,6 +324,6 @@ void start_uart()
     
     uart_init();
     //xTaskCreate(uart_task, "uart_task", 4096, NULL, 10, NULL);
-    xTaskCreate(uart_rcv_task, "uart_rcv_task", 10240, NULL, 10, NULL);
-    xTaskCreate(nock_loose_task, "nock_loose_task", 10240, NULL, 10, NULL);
+    xTaskCreatePinnedToCore(uart_rcv_task, "uart_rcv_task", 10240, NULL, 10, NULL, 1);
+    xTaskCreatePinnedToCore(nock_loose_task, "nock_loose_task", 10240, NULL, 10, NULL, 1);
 }

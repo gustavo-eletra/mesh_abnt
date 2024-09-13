@@ -43,4 +43,4 @@ int abnt_send_hmac_string(ABNT_data data);
 int abnt_open_session(ABNT_data *data, int cmd);
 int abnt_close_session(ABNT_data *data, int cmd);
 void abnt_fsm(ABNT_data *data, uint8_t *buffer);
-void abnt_fsm_default(ABNT_data *data, CMD_queue *cmd_queue);
+void abnt_fsm_default(ABNT_data *data, CMD_queue *cmd_queue, ABNT_queue *q);

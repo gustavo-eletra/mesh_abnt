@@ -38,6 +38,6 @@ void abnt_fsm_default(ABNT_data *data, CMD_queue *cmd_queue, ABNT_queue *q)
     while(state < cmd_queue->size || state >= 0)
     {
         abnt_set_state_from_queue(data, q[state]);
-        state = callbacks.abnt_funcs[state](&data, state);
+        state = callbacks.abnt_funcs[state](data, state);
     }
 }
