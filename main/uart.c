@@ -19,24 +19,16 @@ static const char *DEBUG_TAG = "DEBUG UART TASK: ";
 QueueHandle_t send_message_mesh_q;
 extern QueueHandle_t rcv_message_mesh_q;
 
+void set_abnt_command(uint8_t *data)
+{
+
+}
+
 /**
  * @brief Inicializa as UARTs usadas no projeto.
  */
 static void uart_init(void)
-{
-    // Configuração da UART0 (recepção)
-    uart_config_t uart_config_0 = {
-        .baud_rate = 115200,
-        .data_bits = UART_DATA_8_BITS,
-        .parity    = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
-    };
-    ESP_ERROR_CHECK(uart_param_config(UART_NUM_UART0, &uart_config_0));
-    ESP_ERROR_CHECK(uart_set_pin(UART_NUM_UART0, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
-    ESP_ERROR_CHECK(uart_driver_install(UART_NUM_UART0, BUF_SIZE * 2, 0, 0, NULL, 0));
-
-    // Configuração da UART2 (envio)
+{   // Configuração da UART2 (envio)
     uart_config_t uart_config_2 = {
         .baud_rate = 9600,  // Ajuste conforme necessário
         .data_bits = UART_DATA_8_BITS,
@@ -50,8 +42,6 @@ static void uart_init(void)
      // Inverts the TX and RX sign
     ESP_ERROR_CHECK(uart_set_line_inverse(UART_NUM_UART2, UART_SIGNAL_TXD_INV  | UART_SIGNAL_RXD_INV));
 
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    uart_flush(UART_NUM_UART0);
     uart_flush(UART_NUM_UART2);
     vTaskDelay(pdMS_TO_TICKS(1000));
 
@@ -137,49 +127,6 @@ static void uart_task(void *arg)
         vTaskDelay(1000 / portTICK_PERIOD_MS); // Pequeno atraso para evitar uso excessivo da CPU
     }
 }
-
-/**
- * @brief task to receive commands from the PC's UART and add them to the Queue that will be sent to the Mesh network
- **/
-void uart_rcv_task()
-{
-    uint8_t recv_buffer[BUF_SIZE];
-    for(;;)
-    {
-        // Read data from UART0
-        int len = 0;
-        ESP_ERROR_CHECK(uart_get_buffered_data_len(UART_NUM_UART0, (size_t*)&len));
-        len = uart_read_bytes(UART_NUM_UART0, recv_buffer, len, 100 / portTICK_PERIOD_MS);
-        if (len > 0)
-        {
-            recv_buffer[len] = '\0'; // Adiciona o terminador nulo ao final da string
-
-            char *mac_address = strtok((char *)recv_buffer, "_");
-            char *protocol = strtok(NULL, "_");
-            char *payload = strtok(NULL, "_");
-        
-            if (mac_address && protocol && payload) 
-            {
-                message_t cmd;
-                strncpy(cmd.mac_address, mac_address, sizeof(cmd.mac_address) - 1);
-                strncpy(cmd.protocol, protocol, sizeof(cmd.protocol) - 1);
-                strncpy(cmd.payload, payload, sizeof(cmd.payload) - 1);
-                cmd.mac_address[sizeof(cmd.mac_address) - 1] = '\0';
-                cmd.protocol[sizeof(cmd.protocol) - 1] = '\0';
-                cmd.payload[sizeof(cmd.payload) - 1] = '\0';
-                cmd.payload_size = sizeof(cmd.payload);
-
-                if (xQueueSend(send_message_mesh_q, &cmd, pdMS_TO_TICKS(1000)) != pdTRUE) {
-                    ESP_LOGW(DEBUG_TAG, "Queue full, command dropped");
-                }
-            } else {
-                ESP_LOGE(DEBUG_TAG, "Formato de comando invalido");
-            }
-        }//if (len > 0)
-        
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }//for(;;)
-}//void uart_rcv_task()
 
 void nock_loose_task()
 {
@@ -315,15 +262,15 @@ void start_uart()
     send_message_mesh_q = xQueueCreate(QUEUE_SIZE, sizeof(message_t));
     if (send_message_mesh_q == NULL)
         ESP_LOGE(DEBUG_TAG, "Failed to create queue");
-    else ESP_LOGE(DEBUG_TAG, "Success in create queue");
+    else ESP_LOGI(DEBUG_TAG, "Success in create queue");
 
     rcv_message_mesh_q = xQueueCreate(QUEUE_SIZE, sizeof(message_t));
     if (send_message_mesh_q == NULL)
         ESP_LOGE(TAG, "Failed to create queue");
-    else ESP_LOGE(TAG, "Success in create queue");
+    else ESP_LOGI(TAG, "Success in create queue");
     
-    uart_init();
+    //uart_init();
     //xTaskCreate(uart_task, "uart_task", 4096, NULL, 10, NULL);
-    xTaskCreatePinnedToCore(uart_rcv_task, "uart_rcv_task", 10240, NULL, 10, NULL, 1);
-    xTaskCreatePinnedToCore(nock_loose_task, "nock_loose_task", 10240, NULL, 10, NULL, 1);
+    //xTaskCreatePinnedToCore(uart_rcv_task, "uart_rcv_task", 10240, NULL, 10, NULL, 1);
+    //xTaskCreatePinnedToCore(nock_loose_task, "nock_loose_task", 10240, NULL, 10, NULL, 1);
 }

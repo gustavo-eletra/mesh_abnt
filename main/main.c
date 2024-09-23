@@ -26,8 +26,8 @@
 
 
 #define RX_BUF_SIZE 1024
-#define ROUTER_SSID "AndroidAP2CC1" // SSID da rede Wi-Fi do roteador
-#define ROUTER_PWD "rzue0381"   // senha da rede Wi-Fi do roteador
+#define ROUTER_SSID "ELHP" // SSID da rede Wi-Fi do roteador
+#define ROUTER_PWD "eletra2023"   // senha da rede Wi-Fi do roteador
 #define MESH_AP_PASS "mesh_password"
 #define MESH_CHANNEL 6
 #define MESH_AP_PASS "mesh_password"
