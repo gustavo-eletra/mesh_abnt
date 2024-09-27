@@ -18,14 +18,16 @@
 #include "driver/uart.h"
 #include "esp_system.h"
 #include "driver/gpio.h"
+#include "lwip/sockets.h"
+#include "lwip/sys.h"
 
 #include "mesh_network.h"
 #include "uart.h"
 
 #include "utils.h"
 
-#define RX_SIZE          (2048)
-#define TX_SIZE          (2048)
+#define RX_SIZE          (512)
+#define TX_SIZE          (512)
 
 /*******************************************************
  *                Macros

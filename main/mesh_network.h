@@ -10,6 +10,7 @@
 #include "esp_mesh.h"
 
 extern bool is_root;
+extern QueueHandle_t external_data_queue;
 
 /*******************************************************
  *                Macros
@@ -36,7 +37,7 @@ typedef void (mesh_raw_recv_cb_t)(mesh_addr_t *from, mesh_data_t *data);
  */
 esp_err_t mesh_netifs_init(mesh_raw_recv_cb_t *cb);
 
-/**
+/*
  * @brief Destroy the netifs and related structures
  *
  * @return ESP_OK on success
