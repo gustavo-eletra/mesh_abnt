@@ -26,8 +26,11 @@
 
 #include "utils.h"
 
-#define RX_SIZE          (512)
-#define TX_SIZE          (512)
+#define RX_SIZE          (1024)
+#define TX_SIZE          (1024)
+
+TaskHandle_t net_tx_task_handle;
+TaskHandle_t net_rx_task_handle;
 
 /*******************************************************
  *                Macros
@@ -64,6 +67,40 @@ bool is_root = false;
 /*******************************************************
  *                Function Definitions
  *******************************************************/
+
+void net_send_data_task(void *args)
+{
+    uint8_t buf[TX_SIZE] = {0};
+
+    mesh_addr_t sender;
+    mesh_data_t data = {.data = buf, .size = TX_SIZE};
+
+    struct sockaddr_in dest_adr = {
+        .sin_addr = inet_addr("191.52.224.162"),
+        .sin_family = AF_INET,
+        .sin_port = htons(8888)
+    };
+
+    int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+
+    while(1)
+    {
+                   
+    }
+
+    vTaskDelete(NULL);
+}
+
+void net_receive_data_task(void *args)
+{
+    
+}
+
+void check_health_task(void *args)
+{
+
+}
+
 void send_mesh_p2p_task(void *arg)
 {
     message_t cmd;
